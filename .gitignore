@@ -7,6 +7,6 @@
 
 /*.vcxproj.user
 /*.vcxproj.filters
-/photo_search
-*.o
+
 /downloads/
+/photo_data.json
