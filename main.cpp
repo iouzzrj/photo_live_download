@@ -109,14 +109,8 @@ int main() {
 
     std::unordered_map<std::string, std::string> nameToEtag;
 
-    if (!fs::exists("photo_data.json")) {
-        std::ofstream create("photo_data.json");
-        if (!create) {
-            std::cerr << "Cannot create photo_data.json" << std::endl;
-            return 1;
-        }
-    }
-    std::ofstream out("photo_data.json", std::ios::app);
+    // Overwrite photo_data.json on each run to keep the file size small
+    std::ofstream out("photo_data.json", std::ios::trunc);
     if (!out) {
         std::cerr << "Cannot open photo_data.json" << std::endl;
         return 1;
