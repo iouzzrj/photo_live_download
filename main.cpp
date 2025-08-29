@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <set>
+#include <algorithm>
 #include <filesystem>
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
@@ -162,8 +163,10 @@ int main() {
         std::string title = detail["data"].value("title", "album");
         std::string dirName = sanitizeFilename(title);
         if (dirName.empty()) dirName = "album";
+        fs::path baseDir = "downloads";
+        fs::create_directories(baseDir);
         // Use u8path to safely handle UTF-8 titles (e.g., Chinese characters)
-        fs::path downloadDir = fs::u8path(dirName);
+        fs::path downloadDir = baseDir / fs::u8path(dirName);
         fs::create_directories(downloadDir);
 
         json history = json::array();
@@ -174,7 +177,12 @@ int main() {
                         try {
                                 hf >> history;
                                 for (auto& entry : history) {
-                                        historySet.emplace(entry.value("orderid", ""), entry.value("etag", ""));
+                                        std::string oid = entry.value("orderid", "");
+                                        if (entry.contains("files") && entry["files"].is_array()) {
+                                                for (auto& f : entry["files"]) {
+                                                        historySet.emplace(oid, f.value("etag", ""));
+                                                }
+                                        }
                                 }
                         }
                         catch (json::parse_error&) {
@@ -207,7 +215,14 @@ int main() {
                                 auto key = std::make_pair(orderId, etag);
                                 if (historySet.count(key) == 0) {
                                         if (downloadPhoto(etag, fname, downloadDir)) {
-                                                history.push_back({{"orderid", orderId}, {"title", title}, {"etag", etag}, {"fname", fname}});
+                                                auto it = std::find_if(history.begin(), history.end(), [&](const json& j) {
+                                                        return j.value("orderid", "") == orderId;
+                                                });
+                                                if (it == history.end()) {
+                                                        history.push_back({{"orderid", orderId}, {"title", title}, {"files", json::array()}});
+                                                        it = std::prev(history.end());
+                                                }
+                                                (*it)["files"].push_back({{"etag", etag}, {"fname", fname}});
                                                 historySet.insert(key);
                                                 std::cout << "saved to " << (downloadDir / fname) << std::endl;
                                         }
