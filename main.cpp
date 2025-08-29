@@ -162,7 +162,8 @@ int main() {
         std::string title = detail["data"].value("title", "album");
         std::string dirName = sanitizeFilename(title);
         if (dirName.empty()) dirName = "album";
-        fs::path downloadDir = fs::path(dirName);
+        // Use u8path to safely handle UTF-8 titles (e.g., Chinese characters)
+        fs::path downloadDir = fs::u8path(dirName);
         fs::create_directories(downloadDir);
 
         json history = json::array();
