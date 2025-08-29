@@ -127,6 +127,9 @@ int main() {
 		}
 
 		auto& data = page["data"];
+
+		std::cout << "Writing photo album page " << pageNo << " data to file.\n";
+
 		for (auto& item : data["result"]) {
 			out << item.dump() << '\n';
 			std::string fname = item.value("fname", "");
