@@ -212,8 +212,24 @@ int main() {
                         std::string fname = item.value("fname", "");
                         std::string etag = item.value("etag", "");
                         if (!fname.empty() && names.count(fname)) {
+                                fs::path filePath = downloadDir / fname;
                                 auto key = std::make_pair(orderId, etag);
-                                if (historySet.count(key) == 0) {
+                                if (fs::exists(filePath)) {
+                                        // Ensure history contains the record even if the file already exists
+                                        if (historySet.count(key) == 0) {
+                                                auto it = std::find_if(history.begin(), history.end(), [&](const json& j) {
+                                                        return j.value("orderid", "") == orderId;
+                                                });
+                                                if (it == history.end()) {
+                                                        history.push_back({{"orderid", orderId}, {"title", title}, {"files", json::array()}});
+                                                        it = std::prev(history.end());
+                                                }
+                                                (*it)["files"].push_back({{"etag", etag}, {"fname", fname}});
+                                                historySet.insert(key);
+                                        }
+                                        std::cout << fname << ": already downloaded" << std::endl;
+                                }
+                                else {
                                         if (downloadPhoto(etag, fname, downloadDir)) {
                                                 auto it = std::find_if(history.begin(), history.end(), [&](const json& j) {
                                                         return j.value("orderid", "") == orderId;
@@ -224,14 +240,11 @@ int main() {
                                                 }
                                                 (*it)["files"].push_back({{"etag", etag}, {"fname", fname}});
                                                 historySet.insert(key);
-                                                std::cout << "saved to " << (downloadDir / fname) << std::endl;
+                                                std::cout << "saved to " << filePath << std::endl;
                                         }
                                         else {
                                                 std::cout << "failed to download " << fname << std::endl;
                                         }
-                                }
-                                else {
-                                        std::cout << fname << ": already downloaded" << std::endl;
                                 }
                                 names.erase(fname);
                         }
