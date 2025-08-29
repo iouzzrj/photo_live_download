@@ -54,12 +54,11 @@ bool fetchPage(const std::string& orderId, int pageNo, json& outJson) {
 }
 
 bool downloadPhoto(const std::string& etag, const std::string& fname) {
-	fs::create_directories("downloads");
-	fs::path filePath = fs::path("downloads") / fname;
-	std::ofstream file(filePath, std::ios::binary);
-	if (!file) {
-		std::cerr << "Cannot open file for writing: " << filePath << std::endl;
-		return false;
+        fs::path filePath = fs::path("downloads") / fname;
+        std::ofstream file(filePath, std::ios::binary);
+        if (!file) {
+                std::cerr << "Cannot open file for writing: " << filePath << std::endl;
+                return false;
 	}
 
 	CURL* curl = curl_easy_init();
@@ -112,9 +111,10 @@ int main() {
 	std::unordered_map<std::string, std::string> nameToEtag;
 
 	// Overwrite photo_data.json on each run to keep the file size small
-	std::ofstream out("photo_data.json", std::ios::trunc);
+	fs::create_directories("downloads");
+	std::ofstream out(fs::path("downloads") / "photo_data.json", std::ios::trunc);
 	if (!out) {
-		std::cerr << "Cannot open photo_data.json" << std::endl;
+		std::cerr << "Cannot open downloads/photo_data.json" << std::endl;
 		return 1;
 	}
 
