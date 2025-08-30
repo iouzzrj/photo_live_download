@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{b3fade47-84e4-422d-976d-6d6306972286}</ProjectGuid>
-    <RootNamespace>photolivedownloader</RootNamespace>
+    <ProjectGuid>{bf112400-8deb-4dfe-95d6-1ee596bf7ce4}</ProjectGuid>
+    <RootNamespace>photolivedownload</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

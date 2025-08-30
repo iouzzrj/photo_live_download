@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="photo_live_downloader.vcxproj" Id="b3fade47-84e4-422d-976d-6d6306972286" />
+  <Project Path="photo_live_download.vcxproj" Id="bf112400-8deb-4dfe-95d6-1ee596bf7ce4" />
 </Solution>
